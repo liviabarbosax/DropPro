@@ -1,0 +1,341 @@
+/* --- Estilos Gerais --- */
+body { /* box-sizing já tratado por Tailwind */ }
+.custom-bg { background-color: #1A1A2E; }
+.custom-accent { background-color: #7F5AF0; }
+.custom-accent-hover:hover { background-color: #6B46C1; }
+.custom-text { color: #F0F0F0; }
+.custom-sidebar { background-color: #16213E; }
+.custom-card { background-color: #0F172A; border: 1px solid #334155; }
+.nav-item { transition: all 0.3s ease; }
+.nav-item:hover { background-color: #7F5AF0; transform: translateX(4px); }
+.nav-item.active { background-color: #7F5AF0; border-right: 4px solid #00F5D4; }
+
+/* --- Inputs Gerais --- */
+.form-input {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #374151; /* gray-700 */
+    border: 1px solid #4B5563; /* gray-600 */
+    border-radius: 0.5rem; /* rounded-lg */
+    color: white;
+    font-size: 0.875rem; /* text-sm */
+    line-height: 1.25rem;
+}
+.form-input:focus {
+    outline: none;
+    border-color: #7F5AF0; /* custom-accent color */
+    box-shadow: 0 0 0 2px rgba(127, 90, 240, 0.5);
+}
+/* Estilo específico para selects se necessário */
+select.form-input {
+    appearance: none; /* Remove seta padrão */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+}
+
+/* --- Notificação Flutuante --- */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1070; /* Acima do overlay do modal */
+    transform: translateX(calc(100% + 20px));
+    opacity: 0;
+    transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+    padding: 0.75rem 1.5rem; /* Ajustado padding */
+    border-radius: 0.5rem; /* rounded-lg */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-size: 0.875rem; /* text-sm */
+    font-weight: 500; /* medium */
+}
+.notification.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+/* --- Carrinho Lateral --- */
+#carrinho-painel {
+    position: fixed; top: 0; right: 0; width: 90%; max-width: 450px; height: 100%; /* Ajustado max-width */
+    background-color: #16213E; box-shadow: -10px 0 20px rgba(0,0,0,0.3);
+    z-index: 1040; transform: translateX(100%); transition: transform 0.3s ease-out;
+    display: flex; flex-direction: column;
+}
+@media (min-width: 768px) { #carrinho-painel { width: 35%; max-width: 450px; } } /* Ajustado width */
+#carrinho-painel.show { transform: translateX(0); }
+#carrinho-conteudo-scroll { flex: 1; overflow-y: auto; display: flex; flex-direction: column; padding-bottom: 1rem;}
+#carrinho-itens-lista { padding: 1rem 1rem 0 1rem; }
+#carrinho-rodape { border-top: 1px solid #334155; padding: 1.5rem; background-color: #16213E; margin-top: auto; flex-shrink: 0; }
+
+/* Overlay do Carrinho */
+#carrinho-overlay {
+    position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 1030;
+    opacity: 0; transition: opacity 0.3s ease-out; pointer-events: none;
+}
+#carrinho-overlay.show { opacity: 1; pointer-events: auto; }
+
+/* Botão Flutuante do Carrinho - Usando classes Tailwind no HTML */
+/* Se precisar de mais ajustes: */
+/*
+.fixed.bottom-8.right-8 {
+    width: 4rem; height: 4rem; font-size: 1.875rem;
+}
+*/
+
+/* --- Estilos Página Produtos (Variações) --- */
+#variations-list .variation-item {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr) auto; /* 3 colunas + botão remover */
+    gap: 0.5rem;
+    align-items: center;
+    background-color: #1e293b; /* Fundo um pouco mais claro */
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.8rem;
+}
+#variations-list .variation-item span {
+    color: #cbd5e1; /* gray-300 */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+#variations-list .remove-variation-btn {
+    background: none;
+    border: none;
+    color: #f87171; /* red-400 */
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0.25rem;
+    line-height: 1;
+}
+#variations-list .remove-variation-btn:hover { color: #ef4444; /* red-500 */ }
+.variation-placeholder { display: block; } /* Mostra/esconde via JS */
+#variations-list:not(:empty) .variation-placeholder { display: none; }
+
+
+/* --- Estilos Página Catálogo (Card Produto Atualizado) --- */
+#catalogo-lista .custom-card .p-4 {
+    /* Ajusta padding se necessário */
+}
+#catalogo-lista .product-details p { /* Estilo para SKU, Cat, Forn, Custo */
+    color: #9ca3af; /* gray-400 */
+    font-size: 0.75rem; /* text-xs */
+    margin-bottom: 0.125rem; /* Espaçamento mínimo */
+    line-height: 1.2;
+}
+#catalogo-lista .product-details strong { /* Destaca o valor */
+    color: #e5e7eb; /* gray-200 */
+    font-weight: 500;
+}
+
+#catalogo-lista .product-actions { /* Container dos botões */
+    display: flex;
+    gap: 0.5rem; /* gap-2 */
+    margin-top: 0.75rem; /* mb-3 */
+}
+#catalogo-lista .product-actions button { /* Estilo base para botões de ação */
+    flex: 1; /* Ocupa espaço igual */
+    padding: 0.25rem 0.5rem; /* py-1 px-2 */
+    border-radius: 0.25rem; /* rounded */
+    font-size: 0.75rem; /* text-xs */
+    font-weight: 500; /* medium */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* Botão Precificar específico (definido abaixo nos estilos do Modal) */
+.precificacao-btn {
+    flex: 0.8; /* Um pouco menor */
+    background-color: #4a5568; /* Cinza */
+    color: white;
+    /* padding, border-radius, font-size, etc. definidos abaixo */
+}
+.precificacao-btn:hover { background-color: #2d3748; }
+
+
+/* --- Estilos Página Kits --- */
+/* (Ajustes menores se necessário, principalmente remoção de Venda Direta) */
+#kits-lista-container .custom-card p.text-xs.text-purple-400 { display: none; } /* Esconde texto sobre aba Lojas */
+
+
+/* --- INÍCIO: ESTILOS PARA PRECIFICACAO NO MODAL --- */
+
+/* Variáveis de Cor/Borda */
+:root {
+    --modal-border-color: #334155;
+    --modal-bg: #16213E;
+    --modal-card-bg: #0F172A;
+    --modal-input-bg: #374151;
+    --modal-text-label: #9ca3af;
+    --modal-text-value: #e5e7eb;
+    --modal-text-highlight: #FFFFFF;
+    --modal-text-profit: #34d399;
+    --modal-text-loss: #f87171;
+    --modal-accent: #7F5AF0;
+}
+
+/* Botão de Precificar no Card do Catálogo */
+.precificacao-btn {
+    /* flex: 0.8; */ /* Definido acima nos estilos do catálogo */
+    padding: 4px 8px;
+    border-radius: 0.375rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+/* Overlay do Modal de Precificação */
+.modal-precificacao-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1060;
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+.modal-precificacao-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Corpo Principal do Modal */
+.modal-precificacao {
+    background-color: var(--modal-bg);
+    border: 1px solid var(--modal-border-color);
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    max-width: 700px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.95);
+    opacity: 0;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
+.modal-precificacao-overlay.show .modal-precificacao {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* Cabeçalho do Modal */
+.modal-precificacao-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--modal-border-color);
+    flex-shrink: 0;
+}
+.modal-precificacao-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 1rem;
+}
+.modal-precificacao-close-btn {
+    background: none; border: none; color: var(--modal-text-label);
+    font-size: 1.8rem; line-height: 1; cursor: pointer; padding: 0;
+}
+.modal-precificacao-close-btn:hover { color: white; }
+
+/* Área de Conteúdo do Modal */
+.modal-precificacao-content {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+/* Header do Produto DENTRO do Modal */
+.modal-product-header {
+    display: flex; flex-direction: column; gap: 1rem;
+    background-color: var(--modal-card-bg); padding: 1rem;
+    border-radius: 0.5rem; margin-bottom: 1.5rem;
+}
+@media (min-width: 640px) { .modal-product-header { flex-direction: row; align-items: flex-start; } }
+.modal-product-image {
+    width: 80px; height: 80px; object-fit: cover; border-radius: 0.375rem;
+    border: 1px solid var(--modal-border-color); flex-shrink: 0; align-self: center;
+}
+@media (min-width: 640px) { .modal-product-image { align-self: flex-start; } }
+.modal-product-info { font-size: 0.875rem; color: var(--modal-text-value); flex-grow: 1; }
+.modal-product-info p { margin-bottom: 0.25rem; } /* Espaçamento entre linhas de info */
+.modal-product-info span { color: var(--modal-text-label); margin-right: 0.5rem;}
+.modal-product-info strong { color: white; font-weight: 600; }
+.modal-product-info .text-red-400 { color: var(--modal-text-loss); } /* Garante cor de custo */
+.modal-product-info .text-green-400 { color: var(--modal-text-profit); } /* Garante cor de lucro */
+
+
+/* Card de Precificação por Loja DENTRO do Modal */
+.modal-store-card {
+    background-color: var(--modal-card-bg); border: 1px solid var(--modal-border-color);
+    border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem; transition: border-color 0.2s ease;
+}
+.modal-store-card:hover { border-color: var(--modal-accent); }
+
+.store-card-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 0.75rem; margin-bottom: 0.75rem; border-bottom: 1px solid var(--modal-border-color);
+}
+.store-info { display: flex; align-items: center; gap: 0.75rem; }
+.store-logo { width: 24px; height: 24px; object-fit: contain; }
+.store-name { font-size: 1rem; font-weight: 700; color: white; }
+.store-config { font-size: 0.7rem; color: var(--modal-text-label); text-align: right;}
+
+.store-pricing-body {
+    display: grid; grid-template-columns: 1fr; gap: 0.75rem;
+}
+@media (min-width: 640px) { .store-pricing-body { grid-template-columns: repeat(2, 1fr); gap: 0.75rem 1.5rem; } }
+
+.store-pricing-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
+.store-pricing-label { color: var(--modal-text-label); display: flex; align-items: center; }
+.store-pricing-value { color: var(--modal-text-value); font-weight: 600; text-align: right; }
+.store-pricing-detail { color: var(--modal-text-label); font-size: 0.7rem; margin-left: 4px; }
+
+/* Inputs dentro do card da loja */
+.store-input {
+    width: 90px; font-size: 0.8rem; font-weight: 600; text-align: right;
+    background-color: var(--modal-input-bg); border: 1px solid var(--modal-border-color);
+    border-radius: 0.375rem; color: white; padding: 0.25rem 0.5rem;
+}
+.store-input:focus { outline: none; border-color: var(--modal-accent); box-shadow: 0 0 0 2px rgba(127, 90, 240, 0.5); }
+
+/* Linha do Preço Ideal Sugerido */
+.ideal-price-row .store-pricing-value { color: var(--modal-accent); font-size: 0.9rem; }
+
+/* Linha do Preço Final Ajustável */
+.final-price-row { grid-column: 1 / -1; }
+.final-price-row .store-input { font-size: 0.9rem; width: 100px; border-color: var(--modal-accent); }
+
+/* Linha do Lucro/Margem Real */
+.final-result-row {
+    grid-column: 1 / -1; border-top: 1px dashed var(--modal-border-color);
+    padding-top: 0.75rem; margin-top: 0.25rem; font-size: 0.9rem;
+}
+.final-result-row .store-pricing-value { font-size: 0.95rem; }
+.profit-positive { color: var(--modal-text-profit) !important; }
+.profit-negative { color: var(--modal-text-loss) !important; }
+
+/* Rodapé do Modal */
+.modal-precificacao-footer {
+    padding: 1rem 1.5rem; border-top: 1px solid var(--modal-border-color);
+    text-align: right; flex-shrink: 0;
+}
+.modal-close-button {
+    background-color: #4a5568; color: white; padding: 0.5rem 1rem; border: none;
+    border-radius: 0.375rem; font-size: 0.875rem; font-weight: 600; cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.modal-close-button:hover { background-color: #2d3748; }
+
+/* --- FIM: ESTILOS PARA PRECIFICACAO NO MODAL --- */

@@ -1,1 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domuni Drop v2.1 - Gestão Otimizada</title> {/* Nome Alterado */}
 
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="custom-bg custom-text h-screen overflow-hidden">
+    <div class="flex h-full">
+        <nav class="custom-sidebar w-64 h-full fixed left-0 top-0 overflow-y-auto z-20">
+            <div class="p-6">
+                <h1 class="text-2xl font-bold text-white mb-2">Domuni Drop</h1> {/* Nome Alterado */}
+                <p class="text-xs text-gray-400 mb-8">v2.1 - Gestão Otimizada</p>
+                <ul class="space-y-2">
+                    <li> <a href="#" onclick="showPage('dashboard')" class="nav-item active flex items-center p-3 rounded-lg text-white"> <span class="mr-3">📊</span> Dashboard </a> </li>
+                    <li> <a href="#" onclick="showPage('produtos')" class="nav-item flex items-center p-3 rounded-lg text-gray-300 hover:text-white"> <span class="mr-3">📦</span> Produtos </a> </li>
+                    <li> <a href="#" onclick="showPage('catalogo')" class="nav-item flex items-center p-3 rounded-lg text-gray-300 hover:text-white"> <span class="mr-3">📋</span> Catálogo </a> </li>
+                    <li> <a href="#" onclick="showPage('cotacoes')" class="nav-item flex items-center p-3 rounded-lg text-gray-300 hover:text-white"> <span class="mr-3">💰</span> Cotações </a> </li>
+                    {/* Item "Lojas" Removido */}
+                    <li> <a href="#" onclick="showPage('kits')" class="nav-item flex items-center p-3 rounded-lg text-gray-300 hover:text-white"> <span class="mr-3">🧩</span> Kits </a> </li>
+                    <li> <a href="#" onclick="showPage('financeiro')" class="nav-item flex items-center p-3 rounded-lg text-gray-300 hover:text-white"> <span class="mr-3">💳</span> Financeiro </a> </li>
+                    <li> <a href="#" onclick="showPage('marketing')" class="nav-item flex items-center p-3 rounded-lg text-gray-300 hover:text-white"> <span class="mr-3">🎫</span> Marketing </a> </li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="ml-64 flex-1 p-8 overflow-y-auto">
+            {/* --- Páginas --- */}
+
+            <div id="dashboard-page" class="page-content">
+                {/* Conteúdo Dashboard (sem alterações significativas) */}
+                <h2 class="text-3xl font-bold mb-8 text-white">📊 Dashboard</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                     <div class="custom-card p-6 rounded-lg"> <h4 class="text-gray-400 text-sm font-medium">Vendas Convertidas (Mês)</h4> <p id="dash-vendas-mes" class="text-3xl font-bold text-green-400">R$ 0,00</p> </div>
+                     <div class="custom-card p-6 rounded-lg"> <h4 class="text-gray-400 text-sm font-medium">Lucro Estimado (Mês)</h4> <p id="dash-lucro-mes" class="text-3xl font-bold text-purple-400">R$ 0,00</p> </div>
+                     <div class="custom-card p-6 rounded-lg"> <h4 class="text-gray-400 text-sm font-medium">Cotações Pendentes</h4> <p id="dash-cotacoes-pendentes" class="text-3xl font-bold text-yellow-400">0</p> </div>
+                     <div class="custom-card p-6 rounded-lg"> <h4 class="text-gray-400 text-sm font-medium">Total de Produtos</h4> <p id="dash-total-produtos" class="text-3xl font-bold text-blue-400">0</p> </div>
+                 </div>
+                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                     <div class="lg:col-span-2 custom-card p-6 rounded-lg"> <h3 class="text-xl font-semibold text-white mb-4">Cotações Pendentes Recentes</h3> <div id="dash-lista-cotacoes" class="space-y-4 max-h-96 overflow-y-auto"></div> </div>
+                     <div class="custom-card p-6 rounded-lg">
+                         <h3 class="text-xl font-semibold text-white mb-4">🚀 Atalhos Rápidos</h3>
+                         <div class="space-y-3">
+                             <button onclick="irParaCadastroProduto()" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 px-4 rounded-lg flex items-center"> <span class="mr-3">📦</span> Cadastrar Novo Produto </button>
+                             <button onclick="showPage('catalogo')" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 px-4 rounded-lg flex items-center"> <span class="mr-3">📋</span> Ver Catálogo </button>
+                             <button onclick="abrirCarrinho()" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 px-4 rounded-lg flex items-center"> <span class="mr-3">🛒</span> Iniciar Nova Cotação </button>
+                             <button onclick="showPage('cotacoes')" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 px-4 rounded-lg flex items-center"> <span class="mr-3">💰</span> Ver Histórico de Cotações </button>
+                         </div>
+                     </div>
+                 </div>
+            </div>
+
+            <div id="produtos-page" class="page-content hidden">
+                <h2 class="text-3xl font-bold mb-8 text-white">Gestão de Produtos</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Coluna Principal: Formulário do Produto */}
+                    <div class="lg:col-span-2 custom-card rounded-lg p-6">
+                        <h3 id="produto-form-titulo" class="text-xl font-semibold mb-6 text-white flex items-center"><span class="mr-2">📦</span>Cadastrar Novo Produto</h3>
+                        <form id="produto-form" class="space-y-4">
+                            <input type="hidden" id="produto-id-edit">
+                            {/* ... Campos Imagem, SKU, Categoria, Nome, Fornecedor ... */}
+                             <div>
+                                 <label for="produto-imagem" class="block text-sm font-medium mb-2">Foto Principal</label>
+                                 <input type="file" id="produto-imagem" accept="image/*" class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100">
+                                 <img id="produto-imagem-preview" src="#" alt="Preview" class="mt-2 h-24 w-24 object-cover rounded hidden">
+                             </div>
+                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                 <div><label for="produto-sku" class="block text-sm font-medium mb-2">SKU Principal *</label><input type="text" id="produto-sku" placeholder="SKU do produto base" required class="form-input"></div>
+                                 <div><label for="produto-categoria" class="block text-sm font-medium mb-2">Categoria *</label><input type="text" id="produto-categoria" placeholder="Ex: Armazenamento" required class="form-input"></div>
+                             </div>
+                             <div><label for="produto-nome" class="block text-sm font-medium mb-2">Nome do Produto *</label><input type="text" id="produto-nome" placeholder="Digite o nome do produto" required class="form-input"></div>
+                             <div><label for="produto-fornecedor" class="block text-sm font-medium mb-2">Fornecedor *</label><select id="produto-fornecedor" required class="form-input"><option value="">Selecione...</option></select></div>
+
+                            {/* --- SEÇÃO DE VARIAÇÕES --- */}
+                            <fieldset class="border border-gray-600 p-4 rounded-lg space-y-3">
+                                <legend class="text-sm font-medium px-2 text-gray-300">Variações (Cor, Tamanho, etc.)</legend>
+                                <div id="variations-list" class="space-y-2 max-h-40 overflow-y-auto pr-2">
+                                    {/* Variações adicionadas aparecerão aqui via JS */}
+                                    <p class="text-gray-400 text-xs text-center variation-placeholder">Nenhuma variação adicionada.</p>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 border-t border-gray-600 pt-3">
+                                    <input type="text" id="variation-type" placeholder="Tipo (Ex: Cor)" class="form-input text-xs p-2">
+                                    <input type="text" id="variation-value" placeholder="Valor (Ex: Azul)" class="form-input text-xs p-2">
+                                    <input type="text" id="variation-sku" placeholder="SKU da Variação *" class="form-input text-xs p-2">
+                                </div>
+                                <button type="button" onclick="adicionarVariacao()" class="w-full custom-accent custom-accent-hover text-white px-3 py-1.5 rounded-lg font-medium text-xs">➕ Adicionar Variação</button>
+                            </fieldset>
+                            {/* --- FIM VARIAÇÕES --- */}
+
+                            {/* ... Campos Custo, Picking, Peso, Dimensões ... */}
+                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                 <div><label for="produto-custo" class="block text-sm font-medium mb-2">Custo Base (R$) *</label><input type="number" id="produto-custo" step="0.01" value="0.00" required class="form-input"></div>
+                                 <div><label for="produto-picking" class="block text-sm font-medium mb-2">Picking Fixo (R$) *</label><input type="number" id="produto-picking" step="0.01" value="2.00" required class="form-input"></div>
+                             </div>
+                             {/* Removido Preço Venda Direta */}
+                             <div><label for="produto-peso" class="block text-sm font-medium mb-2">Peso Base (kg) *</label><input type="number" id="produto-peso" step="0.01" value="0.00" required class="form-input"></div>
+                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                 <div><label for="produto-comprimento" class="block text-sm font-medium mb-2">Comprimento Base (cm)</label><input type="number" id="produto-comprimento" value="0" class="form-input"></div>
+                                 <div><label for="produto-largura" class="block text-sm font-medium mb-2">Largura Base (cm)</label><input type="number" id="produto-largura" value="0" class="form-input"></div>
+                                 <div><label for="produto-altura" class="block text-sm font-medium mb-2">Altura Base (cm)</label><input type="number" id="produto-altura" value="0" class="form-input"></div>
+                             </div>
+
+                            {/* Botões Salvar/Cancelar */}
+                            <div class="flex gap-3 pt-4">
+                                <button type="submit" class="flex-1 custom-accent custom-accent-hover text-white py-2 px-4 rounded-lg font-medium">💾 Salvar Produto</button>
+                                <button type="button" onclick="limparFormularioProduto()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg font-medium">Cancelar Edição</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    {/* Coluna Lateral: Fornecedores */}
+                    <div class="lg:col-span-1 custom-card rounded-lg p-6 self-start">
+                        {/* Conteúdo Fornecedores (sem alterações) */}
+                         <h3 class="text-xl font-semibold mb-6 text-white flex items-center"><span class="mr-2">🏢</span>Fornecedores</h3>
+                         <div class="space-y-4">
+                             <div><label for="fornecedores-select" class="block text-sm font-medium mb-2">Cadastrados</label><select id="fornecedores-select" class="form-input"><option value="">Selecione...</option></select></div>
+                             <div><label for="novo-fornecedor" class="block text-sm font-medium mb-2">Novo Fornecedor</label><input type="text" id="novo-fornecedor" placeholder="Nome do fornecedor" class="form-input"></div>
+                             <div class="flex gap-3">
+                                 <button onclick="adicionarFornecedor()" class="flex-1 custom-accent custom-accent-hover text-white px-4 py-2 rounded-lg font-medium text-sm">➕ Adicionar</button>
+                                 <button onclick="removerFornecedor()" class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-sm">🗑️ Remover</button>
+                             </div>
+                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="catalogo-page" class="page-content hidden">
+                 {/* Conteúdo Catálogo (sem alterações na estrutura base) */}
+                 <h2 class="text-3xl font-bold mb-8 text-white">📋 Catálogo</h2>
+                 <div class="custom-card rounded-lg p-6 mb-8">
+                     <h3 class="text-xl font-semibold mb-4 text-white">🔍 Filtros de Busca</h3>
+                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                         <input type="text" id="filtro-busca" placeholder="Buscar por nome ou SKU..." class="md:col-span-2 form-input">
+                         <select id="filtro-categoria" class="form-input"> <option value="">Todas as categorias</option> </select>
+                         <select id="filtro-fornecedor" class="form-input"> <option value="">Todos os fornecedores</option> </select>
+                     </div>
+                     <div class="flex gap-4 mt-4">
+                         <button onclick="aplicarFiltros()" class="custom-accent custom-accent-hover text-white px-5 py-2 rounded-lg font-medium">Buscar</button>
+                         <button onclick="limparFiltros()" class="bg-gray-600 hover:bg-gray-700 text-white px-5 py-2 rounded-lg font-medium">Limpar</button>
+                     </div>
+                 </div>
+                 <div id="catalogo-lista" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                     {/* Cards dos produtos/kits serão inseridos aqui */}
+                 </div>
+            </div>
+
+            <div id="cotacoes-page" class="page-content hidden">
+                 {/* Conteúdo Cotações (sem alterações) */}
+                  <h2 class="text-3xl font-bold mb-8 text-white">💰 Acompanhe suas Cotações</h2>
+                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                     <div class="custom-card p-6 rounded-lg"> <h4 class="text-gray-400 text-sm font-medium">Total</h4> <p id="stat-total" class="text-3xl font-bold text-white">0</p> </div>
+                     <div class="custom-card p-6 rounded-lg"> <h4 class="text-gray-400 text-sm font-medium">Pendentes</h4> <p id="stat-pendente" class="text-3xl font-bold text-yellow-400">0</p> </div>
+                     <div class="custom-card p-6 rounded-lg"> <h4 class="text-gray-400 text-sm font-medium">Convertidas</h4> <p id="stat-convertida" class="text-3xl font-bold text-green-400">0</p> </div>
+                     <div class="custom-card p-6 rounded-lg"> <h4 class="text-gray-400 text-sm font-medium">Conversão</h4> <p id="stat-taxa" class="text-3xl font-bold text-blue-400">0%</p> </div>
+                 </div>
+                 <div class="custom-card p-6 rounded-lg">
+                     <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
+                         <h3 class="text-xl font-semibold text-white">Histórico de Cotações</h3>
+                         <select id="filtro-status-cotacao" class="w-full sm:w-auto form-input p-2 text-sm">
+                             <option value="Todos">Todos status</option> <option value="Pendente">Pendentes</option> <option value="Convertida">Convertidas</option>
+                         </select>
+                     </div>
+                     <div id="lista-cotacoes" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2"></div>
+                 </div>
+            </div>
+
+            {/* Página Lojas Removida */}
+
+            <div id="kits-page" class="page-content hidden">
+                 <h2 class="text-3xl font-bold mb-8 text-white">🧩 Kits e Estratégias</h2>
+                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                     <div class="lg:col-span-1 custom-card rounded-lg p-6 self-start">
+                         <h3 id="kit-form-titulo" class="text-xl font-semibold mb-6 text-white">🧩 Novo Kit</h3>
+                         <form id="kit-form" class="space-y-4">
+                             <input type="hidden" id="kit-id">
+                             <div><label for="kit-nome" class="block text-sm font-medium mb-1">Nome do Kit *</label><input type="text" id="kit-nome" required placeholder="Ex: Kit Cozinha Completa" class="form-input text-sm"></div>
+                             <div>
+                                 <label class="block text-sm font-medium mb-1">Adicionar Produtos *</label>
+                                 <input type="text" id="filtro-produtos-kit" placeholder="Buscar produto por nome/SKU..." class="form-input text-sm mb-2">
+                                 <select id="kit-produtos-select" class="form-input text-sm mb-2"><option value="">Selecione...</option></select>
+                                 <button type="button" onclick="adicionarProdutoAoKit()" class="custom-accent custom-accent-hover text-white px-3 py-1.5 rounded-lg font-medium text-xs w-full">➕ Adicionar Selecionado</button>
+                             </div>
+                             <div id="kit-produtos-lista" class="space-y-1 mt-2 max-h-40 overflow-y-auto bg-gray-800 p-2 rounded border border-gray-600"><p class="text-gray-400 text-center text-xs">Produtos adicionados aparecerão aqui.</p></div>
+                             <div>
+                                 {/* Removido Preço Venda Direta */}
+                                 <p class="text-xs text-gray-400 mt-1">Custo Total do Kit: <span id="kit-custo-total">R$ 0,00</span></p>
+                                 <p class="text-xs text-purple-400 mt-1">A precificação por marketplace é feita no Catálogo.</p> {/* Texto Atualizado */}
+                             </div>
+                             <div class="flex gap-3 pt-2">
+                                 <button type="submit" class="flex-1 custom-accent custom-accent-hover text-white py-2 px-3 rounded-lg font-medium text-sm">💾 Salvar Kit</button>
+                                 <button type="button" onclick="limparFormularioKit()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 px-3 rounded-lg font-medium text-sm">Cancelar</button>
+                             </div>
+                         </form>
+                     </div>
+                     <div class="lg:col-span-2 custom-card rounded-lg p-6">
+                         <h3 class="text-xl font-semibold mb-6 text-white">Seus Kits Cadastrados</h3>
+                         <input type="text" id="filtro-kits" placeholder="Buscar kit por nome..." class="form-input mb-4 w-full md:w-1/2 text-sm">
+                         <div id="kits-lista-container" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+                             <p class="text-gray-400 text-center py-10">Nenhum kit encontrado.</p>
+                         </div>
+                     </div>
+                 </div>
+            </div>
+
+            <div id="financeiro-page" class="page-content hidden">
+                 <h2 class="text-3xl font-bold mb-8 text-white">💵 Gestão Financeira</h2>
+                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                     <div class="custom-card p-6 rounded-lg text-center"> <h4 class="text-gray-400 text-lg font-medium mb-2">📈 Vendas Hoje</h4> <p id="financeiro-vendas-hoje" class="text-4xl font-bold text-green-400">R$ 0,00</p> </div>
+                     <div class="custom-card p-6 rounded-lg text-center"> <h4 class="text-gray-400 text-lg font-medium mb-2">📊 Vendas Mês</h4> <p id="financeiro-vendas-mes" class="text-4xl font-bold text-blue-400">R$ 0,00</p> </div>
+                     <div class="custom-card p-6 rounded-lg text-center"> <h4 class="text-gray-400 text-lg font-medium mb-2">💰 Lucro Total</h4> <p id="financeiro-lucro-total" class="text-4xl font-bold text-purple-400">R$ 0,00</p> </div>
+                 </div>
+                 <div class="custom-card p-6 rounded-lg mb-8">
+                     <h3 class="text-xl font-semibold text-white mb-6">Relatórios e Metas</h3>
+                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                         {/* Botões Habilitados */}
+                         <button onclick="gerarRelatorio('vendas')" class="bg-gray-700 hover:bg-gray-600 text-white font-medium py-4 px-6 rounded-lg flex items-center justify-center text-lg"><span class="mr-2">📊</span> Vendas</button>
+                         <button onclick="gerarRelatorio('lucros')" class="bg-gray-700 hover:bg-gray-600 text-white font-medium py-4 px-6 rounded-lg flex items-center justify-center text-lg"><span class="mr-2">💰</span> Lucros</button>
+                         <button onclick="gerarRelatorio('crescimento')" class="bg-gray-700 hover:bg-gray-600 text-white font-medium py-4 px-6 rounded-lg flex items-center justify-center text-lg"><span class="mr-2">📈</span> Crescimento</button>
+                         <button onclick="definirMetas()" class="bg-gray-700 hover:bg-gray-600 text-white font-medium py-4 px-6 rounded-lg flex items-center justify-center text-lg"><span class="mr-2">🎯</span> Metas</button>
+                     </div>
+                     {/* Removido texto "em desenvolvimento" */}
+                 </div>
+                 <div class="custom-card p-6 rounded-lg">
+                     <h3 class="text-xl font-semibold text-white mb-6">🗓️ Fechamento do Mês</h3>
+                     <p class="text-gray-400 mb-4 text-sm">Ferramentas para consolidar e analisar os resultados mensais.</p>
+                     {/* Botão Habilitado */}
+                     <button onclick="iniciarFechamentoMensal()" class="custom-accent custom-accent-hover text-white font-medium py-3 px-6 rounded-lg">Iniciar Fechamento Mensal</button>
+                     {/* Removido texto "em desenvolvimento" */}
+                 </div>
+            </div>
+
+            <div id="marketing-page" class="page-content hidden">
+                 <h2 class="text-3xl font-bold mb-8 text-white">🎫 Marketing & Cupons</h2>
+                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                     {/* Coluna de Cupons */}
+                     <div class="lg:col-span-2 space-y-8">
+                          {/* Visão Geral Cupons (sem alterações) */}
+                           <div class="custom-card p-6 rounded-lg">
+                               <h3 class="text-xl font-semibold text-white mb-4">🎫 Visão Geral de Cupons</h3>
+                               <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                                   <div><p class="text-gray-400 text-xs">Total Cupons</p><p id="stat-cupom-total" class="text-2xl font-bold text-white">0</p></div>
+                                   <div><p class="text-gray-400 text-xs">Fixos (R$)</p><p id="stat-cupom-fixo" class="text-2xl font-bold text-blue-400">0</p></div>
+                                   <div><p class="text-gray-400 text-xs">Percentuais (%)</p><p id="stat-cupom-percentual" class="text-2xl font-bold text-green-400">0</p></div>
+                                   <div><p class="text-gray-400 text-xs">Usos Registrados</p><p id="stat-cupom-usos" class="text-2xl font-bold text-yellow-400">0</p></div>
+                               </div>
+                           </div>
+                           {/* Lista de Cupons (sem alterações) */}
+                           <div class="custom-card p-6 rounded-lg">
+                               <h3 class="text-xl font-semibold text-white mb-4">📋 Cupons Cadastrados</h3>
+                               <input type="text" id="filtro-cupons" placeholder="Buscar cupom por código..." class="form-input text-sm mb-4 w-full md:w-1/2">
+                               <div id="lista-cupons" class="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
+                                   <p class="text-gray-400 text-center py-10">🎫 Nenhum cupom cadastrado.</p>
+                               </div>
+                           </div>
+                     </div>
+                     {/* Coluna Formulário Novo Cupom */}
+                     <div class="custom-card rounded-lg p-6 self-start">
+                          {/* Formulário Cupom (sem alterações) */}
+                           <h3 id="cupom-form-titulo" class="text-xl font-semibold mb-6 text-white">🎫 Novo Cupom</h3>
+                           <form id="cupom-form" class="space-y-4">
+                               <input type="hidden" id="cupom-id">
+                               <div><label for="cupom-codigo" class="block text-sm font-medium mb-1">Código *</label><input type="text" id="cupom-codigo" required placeholder="Ex: BEMVINDO10" class="form-input text-sm uppercase"></div>
+                               <div><label for="cupom-tipo" class="block text-sm font-medium mb-1">Tipo *</label><select id="cupom-tipo" required class="form-input text-sm"><option value="">Selecione</option><option value="fixo">Valor Fixo (R$)</option><option value="percentual">Percentual (%)</option></select></div>
+                               <div><label for="cupom-valor" class="block text-sm font-medium mb-1">Valor *</label><input type="number" id="cupom-valor" step="0.01" required placeholder="Ex: 10.00 ou 15" class="form-input text-sm"></div>
+                               <div><label for="cupom-usos" class="block text-sm font-medium mb-1">Limite Usos (0=ilimitado)</label><input type="number" id="cupom-usos" value="0" step="1" min="0" class="form-input text-sm"></div>
+                               <div class="flex items-center"><input type="checkbox" id="cupom-ativo" checked class="h-4 w-4 text-purple-600 border-gray-500 rounded focus:ring-purple-500 mr-2"><label for="cupom-ativo" class="text-sm font-medium">Cupom Ativo</label></div>
+                               <div class="flex gap-3 pt-2">
+                                   <button type="submit" class="flex-1 custom-accent custom-accent-hover text-white py-2 px-3 rounded-lg font-medium text-sm">💾 Salvar</button>
+                                   <button type="button" onclick="limparFormularioCupom()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 px-3 rounded-lg font-medium text-sm">Cancelar</button>
+                               </div>
+                           </form>
+                     </div>
+                 </div>
+                 {/* Seção Campanhas */}
+                 <div class="custom-card p-6 rounded-lg mt-8">
+                     <h3 class="text-xl font-semibold text-white mb-6">📢 Gerenciar Campanhas</h3>
+                     <p class="text-gray-400 mb-4 text-sm">Acompanhe campanhas de marketing e seus resultados.</p>
+                     {/* Botão Habilitado */}
+                     <button onclick="verCampanhas()" class="custom-accent custom-accent-hover text-white font-medium py-3 px-6 rounded-lg">Ver Campanhas</button>
+                     {/* Removido texto "em desenvolvimento" */}
+                     {/* Área para exibir campanhas (a ser preenchida por JS) */}
+                     <div id="campanhas-container" class="mt-6"></div>
+                 </div>
+            </div>
+
+        </main>
+    </div>
+
+    {/* --- Elementos Flutuantes e Modais --- */}
+
+    {/* Overlay e Painel do Carrinho */}
+    <div id="carrinho-overlay" onclick="fecharCarrinho()"></div>
+    <aside id="carrinho-painel">
+        {/* Conteúdo do Carrinho (sem alterações) */}
+         <div class="flex justify-between items-center p-6 border-b border-gray-700 flex-shrink-0">
+             <h3 class="text-2xl font-bold text-white">🛒 Carrinho</h3>
+             <button onclick="fecharCarrinho()" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+         </div>
+         <div id="carrinho-conteudo-scroll">
+             <div id="carrinho-itens-lista" class="flex-grow"> </div>
+             <div id="carrinho-rodape">
+                 <div class="grid grid-cols-2 gap-4">
+                     <div><label for="carrinho-descontos" class="block text-xs font-medium mb-1">Descontos (R$)</label><input type="number" id="carrinho-descontos" value="0" step="0.01" class="form-input text-sm p-2"></div>
+                     <div><label for="carrinho-frete" class="block text-xs font-medium mb-1">Frete (R$)</label><input type="number" id="carrinho-frete" value="0" step="0.01" class="form-input text-sm p-2"></div>
+                 </div>
+                 <div id="carrinho-totais" class="space-y-1 text-base my-3">
+                     <div class="flex justify-between"><span>Subtotal:</span><span id="total-subtotal" class="font-semibold">R$ 0,00</span></div>
+                     <div class="flex justify-between text-yellow-400"><span>Descontos:</span><span id="total-descontos" class="font-semibold">- R$ 0,00</span></div>
+                     <div class="flex justify-between"><span>Frete:</span><span id="total-frete" class="font-semibold">R$ 0,00</span></div>
+                     <hr class="border-gray-600 my-1.5">
+                     <div class="flex justify-between text-xl text-white font-bold"><span>Total:</span><span id="total-geral" class="text-green-400">R$ 0,00</span></div>
+                 </div>
+                 <hr class="border-gray-600 my-3">
+                 <div class="custom-card rounded-lg p-4 mb-4">
+                     <h4 class="text-base font-semibold mb-2 text-white">👤 Dados Cliente</h4>
+                     <div class="space-y-2">
+                         <input type="text" id="cliente-nome" placeholder="Nome Cliente" class="form-input text-sm p-2">
+                         <input type="text" id="cliente-whatsapp" placeholder="WhatsApp (Ex: 119...)" class="form-input text-sm p-2">
+                         <div class="grid grid-cols-2 gap-2">
+                             <input type="text" id="cliente-cidade" placeholder="Cidade" class="form-input text-sm p-2">
+                             <input type="text" id="cliente-estado" placeholder="UF" class="form-input text-sm p-2">
+                         </div>
+                         <div>
+                             <label for="cliente-validade" class="block text-xs font-medium mb-1">Validade</label>
+                             <select id="cliente-validade" class="form-input text-sm p-2"><option value="3">3 dias</option><option value="5">5 dias</option><option value="7">7 dias</option><option value="15">15 dias</option></select>
+                         </div>
+                         <button onclick="gerarResumoWhatsapp()" class="w-full custom-accent custom-accent-hover text-white py-2 px-3 rounded-lg font-medium text-sm">✉️ Gerar Resumo</button>
+                     </div>
+                 </div>
+                 <div id="resumo-container" class="custom-card rounded-lg p-4 mb-4 hidden">
+                     <h4 class="text-base font-semibold mb-2 text-white">📄 Resumo WhatsApp</h4>
+                     <textarea id="resumo-whatsapp" rows="8" class="form-input bg-gray-800 text-xs p-2" readonly></textarea>
+                     <div class="flex gap-2 mt-2">
+                         <button onclick="copiarResumo()" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-1.5 px-3 rounded-lg font-medium text-xs">📋 Copiar</button>
+                         <button onclick="salvarCotacao()" class="flex-1 custom-accent custom-accent-hover text-white py-1.5 px-3 rounded-lg font-medium text-xs">💾 Salvar Cotação</button>
+                     </div>
+                 </div>
+                 <button onclick="limparCarrinho()" class="w-full bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg font-medium flex items-center justify-center text-sm"><span class="mr-1">🗑️</span> Limpar Carrinho</button>
+             </div>
+         </div>
+    </aside>
+
+    {/* Notificação Flutuante */}
+    <div id="notification" class="notification">
+        <span id="notification-text"></span>
+    </div>
+
+    {/* Botão Flutuante do Carrinho */}
+    {/* Ajustado tamanho (w-16 h-16) e ícone (text-3xl) - pode precisar de mais ajustes no CSS se necessário */}
+    <button onclick="abrirCarrinho()" class="fixed bottom-8 right-8 custom-accent custom-accent-hover text-white w-16 h-16 rounded-full shadow-lg flex items-center justify-center text-3xl z-[1035]">
+        🛒
+        <span id="carrinho-contador" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">0</span>
+    </button>
+
+    {/* O Modal de Precificação será criado e adicionado aqui pelo script.js */}
+    {/* O Modal de Confirmação será criado e adicionado aqui pelo script.js */}
+    {/* O Modal de Detalhes será criado e adicionado aqui pelo script.js */}
+
+    <script src="script.js" defer></script>
+</body>
+</html>
