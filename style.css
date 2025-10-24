@@ -69,20 +69,19 @@ select.form-input {
 #carrinho-itens-lista { padding: 1rem 1rem 0 1rem; }
 #carrinho-rodape { border-top: 1px solid #334155; padding: 1.5rem; background-color: #16213E; margin-top: auto; flex-shrink: 0; }
 
-/* Overlay do Carrinho */
-#carrinho-overlay {
+/* Overlay do Carrinho e Modais Genéricos */
+#carrinho-overlay, .modal-overlay { /* Aplica a ambos */
     position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 1030;
     opacity: 0; transition: opacity 0.3s ease-out; pointer-events: none;
 }
-#carrinho-overlay.show { opacity: 1; pointer-events: auto; }
+#carrinho-overlay.show, .modal-overlay { /* Aplica a ambos */
+    opacity: 1; pointer-events: auto;
+}
+/* Z-index específico para overlay de modal genérico, se necessário */
+.fixed.inset-0.bg-black.bg-opacity-70 { z-index: 1060 !important; } /* Garante que fique acima do overlay do carrinho */
+
 
 /* Botão Flutuante do Carrinho - Usando classes Tailwind no HTML */
-/* Se precisar de mais ajustes: */
-/*
-.fixed.bottom-8.right-8 {
-    width: 4rem; height: 4rem; font-size: 1.875rem;
-}
-*/
 
 /* --- Estilos Página Produtos (Variações) --- */
 #variations-list .variation-item {
@@ -116,26 +115,24 @@ select.form-input {
 
 
 /* --- Estilos Página Catálogo (Card Produto Atualizado) --- */
-#catalogo-lista .custom-card .p-4 {
-    /* Ajusta padding se necessário */
-}
-#catalogo-lista .product-details p { /* Estilo para SKU, Cat, Forn, Custo */
+#catalogo-lista .custom-card .p-4 { }
+#catalogo-lista .product-details p {
     color: #9ca3af; /* gray-400 */
     font-size: 0.75rem; /* text-xs */
     margin-bottom: 0.125rem; /* Espaçamento mínimo */
     line-height: 1.2;
 }
-#catalogo-lista .product-details strong { /* Destaca o valor */
+#catalogo-lista .product-details strong {
     color: #e5e7eb; /* gray-200 */
     font-weight: 500;
 }
 
-#catalogo-lista .product-actions { /* Container dos botões */
+#catalogo-lista .product-actions {
     display: flex;
     gap: 0.5rem; /* gap-2 */
     margin-top: 0.75rem; /* mb-3 */
 }
-#catalogo-lista .product-actions button { /* Estilo base para botões de ação */
+#catalogo-lista .product-actions button {
     flex: 1; /* Ocupa espaço igual */
     padding: 0.25rem 0.5rem; /* py-1 px-2 */
     border-radius: 0.25rem; /* rounded */
@@ -145,24 +142,19 @@ select.form-input {
     align-items: center;
     justify-content: center;
 }
-/* Botão Precificar específico (definido abaixo nos estilos do Modal) */
 .precificacao-btn {
     flex: 0.8; /* Um pouco menor */
     background-color: #4a5568; /* Cinza */
     color: white;
-    /* padding, border-radius, font-size, etc. definidos abaixo */
 }
 .precificacao-btn:hover { background-color: #2d3748; }
 
 
 /* --- Estilos Página Kits --- */
-/* (Ajustes menores se necessário, principalmente remoção de Venda Direta) */
-#kits-lista-container .custom-card p.text-xs.text-purple-400 { display: none; } /* Esconde texto sobre aba Lojas */
+#kits-lista-container .custom-card p.text-xs.text-purple-400 { display: none; }
 
 
 /* --- INÍCIO: ESTILOS PARA PRECIFICACAO NO MODAL --- */
-
-/* Variáveis de Cor/Borda */
 :root {
     --modal-border-color: #334155;
     --modal-bg: #16213E;
@@ -171,14 +163,12 @@ select.form-input {
     --modal-text-label: #9ca3af;
     --modal-text-value: #e5e7eb;
     --modal-text-highlight: #FFFFFF;
-    --modal-text-profit: #34d399;
-    --modal-text-loss: #f87171;
+    --modal-text-profit: #34d399; /* Verde lucro */
+    --modal-text-loss: #f87171; /* Vermelho prejuízo */
     --modal-accent: #7F5AF0;
 }
 
-/* Botão de Precificar no Card do Catálogo */
 .precificacao-btn {
-    /* flex: 0.8; */ /* Definido acima nos estilos do catálogo */
     padding: 4px 8px;
     border-radius: 0.375rem;
     font-size: 0.7rem;
@@ -186,62 +176,31 @@ select.form-input {
     transition: background-color 0.2s ease;
 }
 
-/* Overlay do Modal de Precificação */
 .modal-precificacao-overlay {
-    position: fixed;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 1060;
-    opacity: 0;
-    transition: opacity 0.3s ease-out;
-    pointer-events: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
+    position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1065; /* Acima do modal genérico */
+    opacity: 0; transition: opacity 0.3s ease-out; pointer-events: none;
+    display: flex; align-items: center; justify-content: center; padding: 1rem;
 }
-.modal-precificacao-overlay.show {
-    opacity: 1;
-    pointer-events: auto;
-}
+.modal-precificacao-overlay.show { opacity: 1; pointer-events: auto; }
 
-/* Corpo Principal do Modal */
 .modal-precificacao {
-    background-color: var(--modal-bg);
-    border: 1px solid var(--modal-border-color);
-    border-radius: 0.75rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    width: 100%;
-    max-width: 700px;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    transform: scale(0.95);
-    opacity: 0;
+    background-color: var(--modal-bg); border: 1px solid var(--modal-border-color);
+    border-radius: 0.75rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    width: 100%; max-width: 700px; max-height: 90vh;
+    display: flex; flex-direction: column;
+    transform: scale(0.95); opacity: 0;
     transition: transform 0.3s ease-out, opacity 0.3s ease-out;
 }
-.modal-precificacao-overlay.show .modal-precificacao {
-    transform: scale(1);
-    opacity: 1;
-}
+.modal-precificacao-overlay.show .modal-precificacao { transform: scale(1); opacity: 1; }
 
-/* Cabeçalho do Modal */
 .modal-precificacao-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--modal-border-color);
-    flex-shrink: 0;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem 1.5rem; border-bottom: 1px solid var(--modal-border-color); flex-shrink: 0;
 }
 .modal-precificacao-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: white;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-right: 1rem;
+    font-size: 1.1rem; font-weight: 700; color: white;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 1rem;
 }
 .modal-precificacao-close-btn {
     background: none; border: none; color: var(--modal-text-label);
@@ -249,14 +208,8 @@ select.form-input {
 }
 .modal-precificacao-close-btn:hover { color: white; }
 
-/* Área de Conteúdo do Modal */
-.modal-precificacao-content {
-    padding: 1.5rem;
-    overflow-y: auto;
-    flex-grow: 1;
-}
+.modal-precificacao-content { padding: 1.5rem; overflow-y: auto; flex-grow: 1; }
 
-/* Header do Produto DENTRO do Modal */
 .modal-product-header {
     display: flex; flex-direction: column; gap: 1rem;
     background-color: var(--modal-card-bg); padding: 1rem;
@@ -269,14 +222,13 @@ select.form-input {
 }
 @media (min-width: 640px) { .modal-product-image { align-self: flex-start; } }
 .modal-product-info { font-size: 0.875rem; color: var(--modal-text-value); flex-grow: 1; }
-.modal-product-info p { margin-bottom: 0.25rem; } /* Espaçamento entre linhas de info */
+.modal-product-info p { margin-bottom: 0.25rem; }
 .modal-product-info span { color: var(--modal-text-label); margin-right: 0.5rem;}
 .modal-product-info strong { color: white; font-weight: 600; }
-.modal-product-info .text-red-400 { color: var(--modal-text-loss); } /* Garante cor de custo */
-.modal-product-info .text-green-400 { color: var(--modal-text-profit); } /* Garante cor de lucro */
+.modal-product-info .text-red-400 { color: var(--modal-text-loss); }
+.modal-product-info .text-green-400 { color: var(--modal-text-profit); }
 
 
-/* Card de Precificação por Loja DENTRO do Modal */
 .modal-store-card {
     background-color: var(--modal-card-bg); border: 1px solid var(--modal-border-color);
     border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem; transition: border-color 0.2s ease;
@@ -292,9 +244,7 @@ select.form-input {
 .store-name { font-size: 1rem; font-weight: 700; color: white; }
 .store-config { font-size: 0.7rem; color: var(--modal-text-label); text-align: right;}
 
-.store-pricing-body {
-    display: grid; grid-template-columns: 1fr; gap: 0.75rem;
-}
+.store-pricing-body { display: grid; grid-template-columns: 1fr; gap: 0.75rem; }
 @media (min-width: 640px) { .store-pricing-body { grid-template-columns: repeat(2, 1fr); gap: 0.75rem 1.5rem; } }
 
 .store-pricing-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
@@ -302,7 +252,6 @@ select.form-input {
 .store-pricing-value { color: var(--modal-text-value); font-weight: 600; text-align: right; }
 .store-pricing-detail { color: var(--modal-text-label); font-size: 0.7rem; margin-left: 4px; }
 
-/* Inputs dentro do card da loja */
 .store-input {
     width: 90px; font-size: 0.8rem; font-weight: 600; text-align: right;
     background-color: var(--modal-input-bg); border: 1px solid var(--modal-border-color);
@@ -310,23 +259,20 @@ select.form-input {
 }
 .store-input:focus { outline: none; border-color: var(--modal-accent); box-shadow: 0 0 0 2px rgba(127, 90, 240, 0.5); }
 
-/* Linha do Preço Ideal Sugerido */
 .ideal-price-row .store-pricing-value { color: var(--modal-accent); font-size: 0.9rem; }
 
-/* Linha do Preço Final Ajustável */
 .final-price-row { grid-column: 1 / -1; }
-.final-price-row .store-input { font-size: 0.9rem; width: 100px; border-color: var(--modal-accent); }
+.final-price-row .store-input { font-size: 0.9rem; width: 100px; /* border-color: var(--modal-accent); REMOVIDO pois é readonly */ }
 
-/* Linha do Lucro/Margem Real */
 .final-result-row {
     grid-column: 1 / -1; border-top: 1px dashed var(--modal-border-color);
     padding-top: 0.75rem; margin-top: 0.25rem; font-size: 0.9rem;
 }
 .final-result-row .store-pricing-value { font-size: 0.95rem; }
-.profit-positive { color: var(--modal-text-profit) !important; }
-.profit-negative { color: var(--modal-text-loss) !important; }
+/* Aplica cores diretamente ao span pai */
+.final-result-row .store-pricing-value.profit-positive { color: var(--modal-text-profit) !important; }
+.final-result-row .store-pricing-value.profit-negative { color: var(--modal-text-loss) !important; }
 
-/* Rodapé do Modal */
 .modal-precificacao-footer {
     padding: 1rem 1.5rem; border-top: 1px solid var(--modal-border-color);
     text-align: right; flex-shrink: 0;
@@ -339,3 +285,8 @@ select.form-input {
 .modal-close-button:hover { background-color: #2d3748; }
 
 /* --- FIM: ESTILOS PARA PRECIFICACAO NO MODAL --- */
+
+/* --- Estilos Adicionais para Modal de Campanhas --- */
+#modal-campanhas .form-input { /* Ajusta padding para formulário do modal */
+    padding: 0.5rem 0.75rem;
+}
