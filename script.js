@@ -468,36 +468,21 @@ function limparFiltros() {
 
 // ATUALIZADO: renderizarCatalogo exibe Produtos e Kits com novo formato
 function renderizarCatalogo(itensParaMostrar) {
-    const catalogoLista = document.getElementById('catalogo-lista');
-    catalogoLista.innerHTML = '';
-    if (itensParaMostrar.length === 0) {
-        catalogoLista.innerHTML = '<p class="text-gray-400 col-span-full text-center py-10">Nenhum item encontrado com os filtros aplicados.</p>';
-        return;
-    }
-
-    itensParaMostrar.forEach(item => {
-        const isKit = !!item.produtos; // Verifica se o item é um kit (tem a propriedade 'produtos')
-        const id = item.id;
-        const nome = item.nome;
-        const sku = isKit ? `KIT-${item.id}` : item.sku;
-        const categoria = isKit ? (item.categoria || "Kit") : item.categoria;
-        const fornecedor = isKit ? '-' : item.fornecedor; // Kits não têm fornecedor único
-        const custoTotal = isKit ? item.custoTotal : (item.custo + item.picking);
-        const imagem = isKit ? 'https://via.placeholder.com/300/16213E/FFFFFF?text=KIT' : (item.imagem || 'https://via.placeholder.com/300'); // Imagem padrão para Kit
+    // ... (código anterior da função) ...
 
         catalogoLista.innerHTML += `
             <div class="custom-card rounded-lg overflow-hidden flex flex-col">
                 <img src="${imagem}" alt="${nome}" class="w-full h-48 object-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/300';">
                 <div class="p-4 flex flex-col flex-grow">
                     <h4 class="font-bold text-white text-base mb-2 truncate">${isKit ? '🧩 ' : ''}${nome}</h4>
-                    <div class="product-details mb-auto"> /* Empurra botões para baixo */
+                    <div class="product-details mb-auto"> //Empurra botões para baixo
                         <p><span>SKU:</span> <strong>${sku}</strong></p>
                         <p><span>Categoria:</span> <strong>${categoria}</strong></p>
                         <p><span>Fornecedor:</span> <strong>${fornecedor}</strong></p>
                         <p><span>Custo Total:</span> <strong class="text-red-400">${formatarMoeda(custoTotal)}</strong></p>
-                         ${isKit ? `<p><span>Itens no Kit:</span> <strong>${item.produtos.length}</strong></p>` : ''} /* Mostra quantidade de itens se for kit */
+                         ${isKit ? `<p><span>Itens no Kit:</span> <strong>${item.produtos.length}</strong></p>` : ''} 
                     </div>
-                     <div class="product-actions mt-3"> /* Adicionado mt-3 */
+                     <div class="product-actions mt-3"> 
                         ${isKit ?
                             `<button onclick="adicionarKitAoCarrinho(${id})" class="flex-1 bg-green-600 hover:bg-green-700 text-white">🛒</button>
                              <button onclick="editarKit(${id})" class="flex-1 custom-accent custom-accent-hover text-white">✏️</button>
@@ -512,7 +497,7 @@ function renderizarCatalogo(itensParaMostrar) {
                     </div>
                 </div>
             </div>`;
-    });
+    // ... (restante da função) ...
 }
 
 
@@ -1228,7 +1213,6 @@ function abrirModalPrecificacao(produtoId) {
                         <p><span>SKU:</span> <strong>${isKit ? `KIT-${item.id}` : item.sku}</strong></p>
                         <p><span>Custo Total:</span> <strong class="text-red-400">${formatarMoeda(custoTotalItem)}</strong></p>
                          ${isKit ? `<p><span>Itens no Kit:</span> <strong>${item.produtos.length}</strong></p>` : ''}
-                        /* Removido Venda Direta */
                     </div>
                 </div>
 
@@ -1271,7 +1255,6 @@ function abrirModalPrecificacao(produtoId) {
                     </div>
                     <div class="store-pricing-row final-result-row">
                         <span class="store-pricing-label">↳ Lucro Real (Margem):</span>
-                        /* Combina lucro e margem */
                         <span class="store-pricing-value" id="lucro-real-${idLoja}">R$ 0,00 (<span id="margem-real-${idLoja}">0,0%</span>)</span>
                     </div>
                 </div>
