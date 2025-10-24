@@ -1277,7 +1277,7 @@ function abrirModalPrecificacao(produtoId) {
                     </div>
                     <div class="store-pricing-row final-price-row">
                          <label for="preco-final-${idLoja}" class="store-pricing-label">Preço Final (R$):</label>
-                        <input type="number" step="0.01" value="0.00" id="preco-final-${idLoja}" class="store-input" oninput="calcularPrecoLojaModal('${key}', ${idBase}, 'preco_final', ${isKit})">
+                        <input type="number" step="0.01" value="0.00" id="preco-final-${idLoja}" class="store-input bg-gray-600" readonly>
                     </div>
                     <div class="store-pricing-row final-result-row">
                         <span class="store-pricing-label">↳ Lucro Real (Margem):</span>
@@ -1319,9 +1319,10 @@ function fecharModalPrecificacao() {
     }
 }
 
-// ATUALIZADO: calcularPrecoLojaModal recebe isKit
+/// [FUNÇÃO CORRIGIDA E SIMPLIFICADA]
 function calcularPrecoLojaModal(lojaKey, itemId, trigger, isKit) {
-    // Busca o item correto (produto ou kit)
+    // O cálculo agora sempre flui do "Lucro Desejado"
+    
     const item = isKit ? kits.find(k => k.id === itemId) : produtos.find(p => p.id === itemId);
     if (!item) return;
 
@@ -1334,8 +1335,8 @@ function calcularPrecoLojaModal(lojaKey, itemId, trigger, isKit) {
     const precoIdealSpan = document.getElementById(`preco-ideal-${idLoja}`);
     const comissaoValorSpan = document.getElementById(`comissao-valor-${idLoja}`);
     const taxaFixaValorSpan = document.getElementById(`taxa-fixa-valor-${idLoja}`);
-    const lucroRealSpan = document.getElementById(`lucro-real-${idLoja}`); // Span combinado
-    const margemRealSpan = document.getElementById(`margem-real-${idLoja}`); // Span dentro do lucroRealSpan
+    const lucroRealSpan = document.getElementById(`lucro-real-${idLoja}`); 
+    const margemRealSpan = document.getElementById(`margem-real-${idLoja}`); 
 
     if (!lucroDesejadoInput || !precoFinalInput || !precoIdealSpan || !comissaoValorSpan || !taxaFixaValorSpan || !lucroRealSpan || !margemRealSpan) {
         console.error(`Erro: Elementos não encontrados no modal para loja ${lojaKey}, item ${itemId}`);
@@ -1346,41 +1347,36 @@ function calcularPrecoLojaModal(lojaKey, itemId, trigger, isKit) {
     const custoTotalItem = isKit ? item.custoTotal : (item.custo + item.picking);
     const lucroDesejado = parseFloat(lucroDesejadoInput.value) || 0;
 
-    // 3. Calcular Preço Ideal
+    // 3. Calcular Preço Ideal (que será o Preço Final)
     const subtotalParaCalculo = custoTotalItem + lucroDesejado + cfg.taxaFixa;
-    const precoIdeal = (cfg.comissao < 1) ? subtotalParaCalculo / (1 - cfg.comissao) : subtotalParaCalculo;
+    const precoFinalCalculado = (cfg.comissao < 1) ? subtotalParaCalculo / (1 - cfg.comissao) : subtotalParaCalculo;
 
-    // 4. Calcular Taxas sobre o Preço Ideal
-    const comissaoValorIdeal = precoIdeal * cfg.comissao;
+    // 4. Calcular Taxas sobre o Preço Final
+    const comissaoValor = precoFinalCalculado * cfg.comissao;
     const taxaFixaValor = cfg.taxaFixa;
 
-    // 5. Atualizar Spans do Preço Ideal e Taxas
-    precoIdealSpan.textContent = formatarMoeda(precoIdeal);
-    comissaoValorSpan.textContent = formatarMoeda(comissaoValorIdeal);
+    // 5. Calcular Lucro/Margem Reais com base no Preço Final Calculado
+    // (Isto é uma verificação, o lucro real deve ser muito próximo do 'lucroDesejado')
+    const receitaLiquida = precoFinalCalculado - comissaoValor - cfg.taxaFixa;
+    const lucroReal = receitaLiquida - custoTotalItem; 
+    const margemReal = (precoFinalCalculado > 0) ? (lucroReal / precoFinalCalculado * 100) : 0;
+
+    // 6. Atualizar Spans e Inputs
+    precoIdealSpan.textContent = formatarMoeda(precoFinalCalculado); // Preço Ideal é o Preço Final
+    comissaoValorSpan.textContent = formatarMoeda(comissaoValor);
     taxaFixaValorSpan.textContent = formatarMoeda(taxaFixaValor);
+    
+    // Atualiza o input 'Preço Final' que agora é readonly
+    precoFinalInput.value = precoFinalCalculado.toFixed(2);
 
-    // 6. Atualizar Preço Final se necessário
-    if (trigger === 'init' || trigger === 'lucro_loja') {
-        precoFinalInput.value = precoIdeal.toFixed(2);
-    }
-
-    // 7. Calcular Lucro/Margem Reais com base no Preço Final
-    const precoFinalAjustado = parseFloat(precoFinalInput.value) || 0;
-    const comissaoReal = precoFinalAjustado * cfg.comissao;
-    const receitaLiquida = precoFinalAjustado - comissaoReal - cfg.taxaFixa;
-    const lucroReal = receitaLiquida - custoTotalItem; // Lucro direto sobre o custo total
-    const margemReal = (precoFinalAjustado > 0) ? (lucroReal / precoFinalAjustado * 100) : 0;
-
-    // 8. Atualizar Spans de Lucro/Margem Reais
+    // 7. Atualizar Spans de Lucro/Margem Reais
     const lucroRealFormatado = formatarMoeda(lucroReal);
     const margemRealFormatada = `${margemReal.toFixed(1).replace('.', ',')}%`;
 
-    // Atualiza o span combinado
     lucroRealSpan.textContent = `${lucroRealFormatado} (${margemRealFormatada})`;
-    // Atualiza o span interno da margem (se precisar usar separadamente)
     margemRealSpan.textContent = margemRealFormatada;
 
-    // Aplica classes de cor ao span combinado
+    // 8. Aplicar classes de cor
     lucroRealSpan.classList.remove('profit-positive', 'profit-negative');
     if (lucroReal > 0) {
         lucroRealSpan.classList.add('profit-positive');
