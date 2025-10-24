@@ -1282,8 +1282,11 @@ function abrirModalPrecificacao(produtoId) {
                     </div>
                     <div class="store-pricing-row final-result-row">
                         <span class="store-pricing-label">↳ Lucro Real (Margem):</span>
-                        <span class="store-pricing-value" id="lucro-real-${idLoja}">R$ 0,00 (<span id="margem-real-${idLoja}">0,0%</span>)</span>
-                    </div>
+                        
+                        <span class="store-pricing-value">
+                            <span id="lucro-real-${idLoja}">R$ 0,00</span> (<span id="margem-real-${idLoja}">0,0%</span>)
+                        </span>
+                        </div>
                 </div>
             </div>`;
     });
@@ -1376,15 +1379,17 @@ function calcularPrecoLojaModal(lojaKey, itemId, trigger, isKit) {
     const lucroRealFormatado = formatarMoeda(lucroReal);
     const margemRealFormatada = `${margemReal.toFixed(1).replace('.', ',')}%`;
 
-    lucroRealSpan.textContent = `${lucroRealFormatado} (${margemRealFormatada})`;
+    // ===== INÍCIO DA CORREÇÃO 2 (JS) =====
+    lucroRealSpan.textContent = lucroRealFormatado;
     margemRealSpan.textContent = margemRealFormatada;
+    // ===== FIM DA CORREÇÃO 2 (JS) =====
 
     // 8. Aplicar classes de cor
-    lucroRealSpan.classList.remove('profit-positive', 'profit-negative');
+    lucroRealSpan.parentElement.classList.remove('profit-positive', 'profit-negative'); // Aplica no PAI
     if (lucroReal > 0) {
-        lucroRealSpan.classList.add('profit-positive');
+        lucroRealSpan.parentElement.classList.add('profit-positive');
     } else if (lucroReal < 0) {
-        lucroRealSpan.classList.add('profit-negative');
+        lucroRealSpan.parentElement.classList.add('profit-negative');
     }
 }
 // ===== FIM DA CORREÇÃO 2 =====
