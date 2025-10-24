@@ -490,14 +490,14 @@ function renderizarCatalogo(itensParaMostrar) {
                 <img src="${imagem}" alt="${nome}" class="w-full h-48 object-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/300';">
                 <div class="p-4 flex flex-col flex-grow">
                     <h4 class="font-bold text-white text-base mb-2 truncate">${isKit ? '🧩 ' : ''}${nome}</h4>
-                    <div class="product-details mb-auto"> {/* Empurra botões para baixo */}
+                    <div class="product-details mb-auto"> /* Empurra botões para baixo */
                         <p><span>SKU:</span> <strong>${sku}</strong></p>
                         <p><span>Categoria:</span> <strong>${categoria}</strong></p>
                         <p><span>Fornecedor:</span> <strong>${fornecedor}</strong></p>
                         <p><span>Custo Total:</span> <strong class="text-red-400">${formatarMoeda(custoTotal)}</strong></p>
-                         ${isKit ? `<p><span>Itens no Kit:</span> <strong>${item.produtos.length}</strong></p>` : ''} {/* Mostra quantidade de itens se for kit */}
+                         ${isKit ? `<p><span>Itens no Kit:</span> <strong>${item.produtos.length}</strong></p>` : ''} /* Mostra quantidade de itens se for kit */
                     </div>
-                     <div class="product-actions mt-3"> {/* Adicionado mt-3 */}
+                     <div class="product-actions mt-3"> /* Adicionado mt-3 */
                         ${isKit ?
                             `<button onclick="adicionarKitAoCarrinho(${id})" class="flex-1 bg-green-600 hover:bg-green-700 text-white">🛒</button>
                              <button onclick="editarKit(${id})" class="flex-1 custom-accent custom-accent-hover text-white">✏️</button>
@@ -545,8 +545,8 @@ function renderizarCarrinho() {
                     <div class="flex-1 min-w-0">
                         <p class="text-white font-semibold truncate text-sm">${item.nome}</p>
                         <p class="text-gray-400 text-xs">SKU: ${item.sku}</p>
-                        <p class="text-gray-300 text-xs">Unit: ${formatarMoeda(item.precoVenda)}</p> {/* Preço de venda do item/kit */}
-                        <p class="text-red-400 text-xs">Custo: ${formatarMoeda(custoUnitario)}</p> {/* Custo do item/kit */}
+                        <p class="text-gray-300 text-xs">Unit: ${formatarMoeda(item.precoVenda)}</p> /* Preço de venda do item/kit */
+                        <p class="text-red-400 text-xs">Custo: ${formatarMoeda(custoUnitario)}</p> /* Custo do item/kit */
                     </div>
                     <div class="flex flex-col items-end">
                         <div class="flex items-center gap-1 mb-1">
@@ -890,19 +890,19 @@ function renderizarListaKits() {
                         <h4 class="text-sm font-bold text-white mb-0.5 truncate">🧩 ${k.nome}</h4>
                         <p class="text-gray-400 text-xs">${k.produtos.length} produto(s)</p>
                     </div>
-                    {/* Removido Preço e Lucro Direto */}
+                    /* Removido Preço e Lucro Direto */
                 </div>
                 <div class="mb-2 p-1.5 bg-gray-800 rounded text-xs">
                      <p>Custo Total do Kit: ${formatarMoeda(k.custoTotal)}</p>
                 </div>
                 <div class="flex gap-1.5">
                     <button onclick="mostrarDetalhesKit(${k.id})" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs">👁️</button>
-                    {/* Adicionar Kit ao Carrinho pode precisar de um preço padrão ou abrir modal */}
+                    /* Adicionar Kit ao Carrinho pode precisar de um preço padrão ou abrir modal */
                     <button onclick="adicionarKitAoCarrinho(${k.id})" class="flex-1 bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs">🛒</button>
                     <button onclick="editarKit(${k.id})" class="flex-1 custom-accent custom-accent-hover text-white px-2 py-1 rounded text-xs">✏️</button>
                     <button onclick="excluirKit(${k.id})" class="flex-1 bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs">🗑️</button>
-                     {/* Botão de precificar Kit (desabilitado por enquanto) */}
-                     {/* <button disabled class="flex-1 bg-gray-500 text-gray-300 px-2 py-1 rounded text-xs cursor-not-allowed">💰</button> */}
+                     /* Botão de precificar Kit (desabilitado por enquanto) */
+                     /* <button disabled class="flex-1 bg-gray-500 text-gray-300 px-2 py-1 rounded text-xs cursor-not-allowed">💰</button> */
                 </div>
             </div>`;
     });
@@ -1228,7 +1228,7 @@ function abrirModalPrecificacao(produtoId) {
                         <p><span>SKU:</span> <strong>${isKit ? `KIT-${item.id}` : item.sku}</strong></p>
                         <p><span>Custo Total:</span> <strong class="text-red-400">${formatarMoeda(custoTotalItem)}</strong></p>
                          ${isKit ? `<p><span>Itens no Kit:</span> <strong>${item.produtos.length}</strong></p>` : ''}
-                        {/* Removido Venda Direta */}
+                        /* Removido Venda Direta */
                     </div>
                 </div>
 
@@ -1271,7 +1271,7 @@ function abrirModalPrecificacao(produtoId) {
                     </div>
                     <div class="store-pricing-row final-result-row">
                         <span class="store-pricing-label">↳ Lucro Real (Margem):</span>
-                        {/* Combina lucro e margem */
+                        /* Combina lucro e margem */
                         <span class="store-pricing-value" id="lucro-real-${idLoja}">R$ 0,00 (<span id="margem-real-${idLoja}">0,0%</span>)</span>
                     </div>
                 </div>
