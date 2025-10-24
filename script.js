@@ -301,6 +301,15 @@ function handleSalvarProduto(e) {
         }
         salvarDados('produtos', produtos);
         limparFormularioProduto(); // Limpa DEPOIS de salvar
+        
+        // --- INÍCIO DA CORREÇÃO ---
+        // Limpa os filtros do catálogo antes de ir para a página
+        // Isso garante que o produto novo apareça e não seja filtrado
+        document.getElementById('filtro-busca').value = '';
+        document.getElementById('filtro-categoria').value = '';
+        document.getElementById('filtro-fornecedor').value = '';
+        // --- FIM DA CORREÇÃO ---
+
         showPage('catalogo');
     };
 
@@ -468,15 +477,32 @@ function limparFiltros() {
 
 // ATUALIZADO: renderizarCatalogo exibe Produtos e Kits com novo formato
 function renderizarCatalogo(itensParaMostrar) {
-    // ... (código anterior da função) ...
+    const catalogoLista = document.getElementById('catalogo-lista');
+    catalogoLista.innerHTML = ''; // Limpa a lista
+    
+    if (itensParaMostrar.length === 0) {
+        catalogoLista.innerHTML = '<p class="text-gray-400 text-center col-span-full">Nenhum produto ou kit encontrado com esses filtros.</p>';
+        return;
+    }
+
+    itensParaMostrar.sort((a, b) => a.nome.localeCompare(b.nome)); // Ordena alfabeticamente
+
+    itensParaMostrar.forEach(item => {
+        const isKit = !!item.produtos; // Verifica se é um kit (se tem a propriedade 'produtos')
+        const id = item.id;
+        const nome = item.nome;
+        const imagem = item.imagem || 'https://via.placeholder.com/300';
+        const sku = isKit ? `KIT-${item.id}` : item.sku;
+        const categoria = item.categoria || (isKit ? 'Kit' : 'N/A');
+        const fornecedor = isKit ? 'Múltiplos' : (item.fornecedor || 'N/A');
+        const custoTotal = isKit ? item.custoTotal : (item.custo + item.picking);
 
         catalogoLista.innerHTML += `
             <div class="custom-card rounded-lg overflow-hidden flex flex-col">
                 <img src="${imagem}" alt="${nome}" class="w-full h-48 object-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/300';">
                 <div class="p-4 flex flex-col flex-grow">
                     <h4 class="font-bold text-white text-base mb-2 truncate">${isKit ? '🧩 ' : ''}${nome}</h4>
-                    <div class="product-details mb-auto"> //Empurra botões para baixo
-                        <p><span>SKU:</span> <strong>${sku}</strong></p>
+                    <div class="product-details mb-auto"> <p><span>SKU:</span> <strong>${sku}</strong></p>
                         <p><span>Categoria:</span> <strong>${categoria}</strong></p>
                         <p><span>Fornecedor:</span> <strong>${fornecedor}</strong></p>
                         <p><span>Custo Total:</span> <strong class="text-red-400">${formatarMoeda(custoTotal)}</strong></p>
@@ -497,7 +523,7 @@ function renderizarCatalogo(itensParaMostrar) {
                     </div>
                 </div>
             </div>`;
-    // ... (restante da função) ...
+    });
 }
 
 
