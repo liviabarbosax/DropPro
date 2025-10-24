@@ -1,6 +1,6 @@
 // --- Dados Persistentes (Lidos apenas uma vez) ---
 let fornecedores = JSON.parse(localStorage.getItem('fornecedores')) || ['Fornecedor Exemplo'];
-let produtos = JSON.parse(localStorage.getItem('produtos')) || []; // Contém { ..., variations: [{ type, value, sku }, ...] }
+let produtos = JSON.parse(localStorage.getItem('produtos')) || []; // Contém { ..., variations: [...], pricingConfig: { shopee: 15.00, ... } }
 let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
 let cotacoes = JSON.parse(localStorage.getItem('cotacoes')) || [];
 let kits = JSON.parse(localStorage.getItem('kits')) || [];
@@ -84,7 +84,10 @@ function showPage(pageId) {
     switch (pageId) {
         case 'dashboard': calcularDashboard(); break;
         case 'produtos':
-            limparFormularioProduto(); // Sempre limpa ao entrar, a edição preenche depois
+            // ===== INÍCIO DA CORREÇÃO 1.1 (Bug Edição) =====
+            // A limpeza agora é tratada pelo clique (index.html) ou por 'irParaCadastroProduto()'
+            // limparFormularioProduto(); // REMOVIDO
+            // ===== FIM DA CORREÇÃO 1.1 =====
             break;
         case 'catalogo': carregarFiltrosCatalogo(); aplicarFiltros(); break;
         case 'cotacoes': renderizarCotacoes(); break;
@@ -96,7 +99,13 @@ function showPage(pageId) {
     fecharCarrinho();
     fecharModalPrecificacao(); // Garante que feche ao navegar
 }
-function irParaCadastroProduto() { showPage('produtos'); } // Não precisa mais limpar aqui
+
+// ===== INÍCIO DA CORREÇÃO 1.2 (Bug Edição) =====
+function irParaCadastroProduto() { 
+    limparFormularioProduto(); // Garante que o formulário esteja limpo
+    showPage('produtos'); 
+}
+// ===== FIM DA CORREÇÃO 1.2 =====
 
 // --- Dashboard ---
 // ... (código do Dashboard permanece o mesmo) ...
@@ -254,6 +263,7 @@ function handleSalvarProduto(e) {
         altura: parseInt(document.getElementById('produto-altura').value) || 0,
         // Adiciona as variações salvas temporariamente
         variations: [...produtoVariationsTemporario]
+        // pricingConfig será mantido se já existir (na parte de edição)
     };
 
     // Validação
@@ -285,10 +295,10 @@ function handleSalvarProduto(e) {
                 if (!imageUrl && produtos[index].imagem) {
                     produtoData.imagem = produtos[index].imagem;
                 }
-                // Mantém datas originais se existirem, atualiza data de modificação
+                // Mantém datas originais e config de precificação, atualiza data de modificação
                 produtos[index] = {
-                    ...produtos[index], // Mantém ID e dataCadastro
-                    ...produtoData, // Sobrescreve com novos dados
+                    ...produtos[index], // Mantém ID, dataCadastro, pricingConfig
+                    ...produtoData, // Sobrescreve com novos dados do formulário
                     dataAtualizacao: new Date().toISOString()
                 };
                 mostrarNotificacao('Produto atualizado com sucesso!', 'success');
@@ -296,19 +306,18 @@ function handleSalvarProduto(e) {
         } else {
             produtoData.id = Date.now();
             produtoData.dataCadastro = new Date().toISOString();
+            produtoData.pricingConfig = {}; // Inicializa config de precificação para novos produtos
             produtos.push(produtoData);
             mostrarNotificacao('Produto salvo com sucesso!', 'success');
         }
         salvarDados('produtos', produtos);
         limparFormularioProduto(); // Limpa DEPOIS de salvar
         
-        // --- INÍCIO DA CORREÇÃO ---
         // Limpa os filtros do catálogo antes de ir para a página
-        // Isso garante que o produto novo apareça e não seja filtrado
+        // Isso garante que o produto novo/editado apareça
         document.getElementById('filtro-busca').value = '';
         document.getElementById('filtro-categoria').value = '';
         document.getElementById('filtro-fornecedor').value = '';
-        // --- FIM DA CORREÇÃO ---
 
         showPage('catalogo');
     };
@@ -325,9 +334,16 @@ function handleSalvarProduto(e) {
 function editarProduto(id) {
     const produto = produtos.find(p => p.id === id);
     if (!produto) return;
-    produtoEditId = id;
-    limparFormularioProduto(); // Limpa primeiro para resetar tudo
 
+    // 1. Navega para a página. Se o usuário veio de outro link, o formulário será limpo (pela Correção 1.3)
+    // Se ele já estava na página, ela apenas continua visível.
+    showPage('produtos'); 
+
+    // 2. Limpa o formulário ANTES de preencher
+    limparFormularioProduto(); 
+    
+    // 3. Agora que a página está visível e limpa, preenchemos os dados
+    produtoEditId = id;
     document.getElementById('produto-id-edit').value = id;
     document.getElementById('produto-sku').value = produto.sku;
     document.getElementById('produto-nome').value = produto.nome;
@@ -335,7 +351,6 @@ function editarProduto(id) {
     document.getElementById('produto-fornecedor').value = produto.fornecedor;
     document.getElementById('produto-custo').value = produto.custo.toFixed(2);
     document.getElementById('produto-picking').value = produto.picking.toFixed(2);
-    // document.getElementById('produto-preco-venda').value = produto.precoVenda.toFixed(2); // REMOVIDO
     document.getElementById('produto-peso').value = produto.peso.toFixed(2);
     document.getElementById('produto-comprimento').value = produto.comprimento;
     document.getElementById('produto-largura').value = produto.largura;
@@ -355,8 +370,8 @@ function editarProduto(id) {
     document.getElementById('produto-imagem').value = '';
 
     document.getElementById('produto-form-titulo').innerHTML = `<span class="mr-2">✏️</span> Editando Produto`;
-    showPage('produtos'); // Garante que a página de produtos está visível
 }
+
 
 function limparFormularioProduto() {
     produtoEditId = null;
@@ -611,14 +626,20 @@ function calcularTotais() {
     document.getElementById('total-frete').textContent = formatarMoeda(f);
     document.getElementById('total-geral').textContent = formatarMoeda(t);
 }
-// Ajustar adicionarAoCarrinho para usar um preço padrão se necessário ou buscar do modal?
+
 function adicionarAoCarrinho(id) {
     const p = produtos.find(x => x.id === id);
     if (!p) return;
 
-    // AQUI: Decidir qual preço usar. Usaremos o 'precoVenda' antigo como fallback por enquanto.
-    // O ideal seria abrir o modal de precificação, escolher a loja "WhatsApp" e usar esse preço.
-    const precoVendaCarrinho = p.precoVenda || (p.custo + p.picking + 10); // Fallback: Custo + Picking + R$10
+    // Busca o preço de "WhatsApp" (venda direta) que foi salvo no modal de precificação
+    const precoSalvo = p.pricingConfig && p.pricingConfig.whatsapp 
+        ? parseFloat(document.getElementById(`preco-final-whatsapp-${id}`)?.value) // Tenta pegar o valor calculado se o modal estiver aberto (não é o caso aqui)
+        : null;
+
+    // Se não achou config de whatsapp, usa um fallback
+    const precoVendaCarrinho = (p.pricingConfig && p.pricingConfig.whatsapp)
+        ? calcularPrecoFinal(p.custo + p.picking, p.pricingConfig.whatsapp, lojasConfig.whatsapp)
+        : (p.precoVenda || (p.custo + p.picking + 10)); // Fallback: Custo + Picking + R$10
 
     const i = carrinho.find(item => item.id === id && !item.isKit);
     if (i) {
@@ -630,6 +651,13 @@ function adicionarAoCarrinho(id) {
     mostrarNotificacao(`${p.nome} adicionado ao carrinho!`, 'success');
     renderizarCarrinho();
     abrirCarrinho();
+}
+
+// Função auxiliar para calcular o preço final com base no lucro (usada pelo adicionarAoCarrinho)
+function calcularPrecoFinal(custoTotalItem, lucroDesejado, cfg) {
+    const subtotalParaCalculo = custoTotalItem + lucroDesejado + cfg.taxaFixa;
+    const precoFinalCalculado = (cfg.comissao < 1) ? subtotalParaCalculo / (1 - cfg.comissao) : subtotalParaCalculo;
+    return precoFinalCalculado;
 }
 
 
@@ -933,13 +961,17 @@ function mostrarDetalhesKit(id) {
 function editarKit(id) {
     const k = kits.find(x => x.id === id);
     if (!k) return;
+    
+    // 1. Navega para a página
+    showPage('kits');
+    
+    // 2. Preenche os dados
     document.getElementById('kit-id').value = k.id;
     document.getElementById('kit-nome').value = k.nome;
     // REMOVIDO: document.getElementById('kit-preco-venda').value = k.precoVenda.toFixed(2);
     document.getElementById('kit-form-titulo').innerHTML = '✏️ Editando Kit';
     kitProdutosTemporario = [...k.produtos];
     renderizarProdutosDoKit();
-    showPage('kits'); // Garante que a página de kits está visível
 }
 // confirmarExclusaoKit permanece o mesmo
 function excluirKit(id) {
@@ -1094,6 +1126,7 @@ function editarCupom(id) {
     document.getElementById('cupom-usos').value = c.limitUsos;
     document.getElementById('cupom-ativo').checked = c.ativo;
     document.getElementById('cupom-form-titulo').innerHTML = '✏️ Editando Cupom';
+    showPage('marketing');
 }
 function excluirCupom(id) {
     abrirModalConfirmacao(`Tem certeza que deseja excluir este cupom?`, () => confirmarExclusaoCupom(id));
@@ -1204,23 +1237,25 @@ function fecharModal() {
 
 
 // --- Funções do Modal de Precificação ---
-// ... (código Modal Precificação - abrirModalPrecificacao, fecharModalPrecificacao, calcularPrecoLojaModal - permanece o mesmo) ...
+
 function abrirModalPrecificacao(produtoId) {
     fecharModal();
     fecharModalPrecificacao();
 
-    // Encontra produto OU kit (precisamos unificar a busca)
     const produto = produtos.find(p => p.id === produtoId);
-    // const kit = kits.find(k => k.id === produtoId); // Desabilitado para kits por enquanto
-    const item = produto; // || kit; // Usaremos 'item' genericamente
+    const item = produto; // Usaremos 'item' genericamente
 
     if (!item) {
         mostrarNotificacao('Item não encontrado para precificação.', 'error');
         return;
     }
-    const isKit = !produto; // Define se é kit
+    const isKit = !produto; // Define se é kit (sempre false por enquanto)
     const custoTotalItem = isKit ? item.custoTotal : (item.custo + item.picking);
     const idBase = item.id;
+
+    // ===== INÍCIO DA CORREÇÃO 2.1 (Salvar Precificação) =====
+    const savedPricing = item.pricingConfig || {}; // Garante que é um objeto
+    // ===== FIM DA CORREÇÃO 2.1 =====
 
     const overlay = document.createElement('div');
     overlay.id = 'modal-precificacao-overlay';
@@ -1249,6 +1284,11 @@ function abrirModalPrecificacao(produtoId) {
         const loja = lojasConfig[key];
         const idLoja = `${key}-${idBase}`;
 
+        // ===== INÍCIO DA CORREÇÃO 2.2 (Salvar Precificação) =====
+        // Busca o lucro salvo; se não existir, usa 10.00 como padrão
+        const lucroSalvo = (savedPricing[key] !== undefined) ? savedPricing[key].toFixed(2) : "10.00";
+        // ===== FIM DA CORREÇÃO 2.2 =====
+
         modalHTML += `
             <div class="modal-store-card">
                 <div class="store-card-header">
@@ -1261,8 +1301,8 @@ function abrirModalPrecificacao(produtoId) {
                 <div class="store-pricing-body">
                     <div class="store-pricing-row">
                         <label for="lucro-desejado-${idLoja}" class="store-pricing-label">Lucro Desejado (R$):</label>
-                        <input type="number" step="0.01" value="10.00" id="lucro-desejado-${idLoja}" class="store-input" oninput="calcularPrecoLojaModal('${key}', ${idBase}, 'lucro_loja', ${isKit})">
-                    </div>
+                        <input type="number" step="0.01" value="${lucroSalvo}" id="lucro-desejado-${idLoja}" class="store-input" oninput="calcularPrecoLojaModal('${key}', ${idBase}, 'lucro_loja', ${isKit})">
+                        </div>
                      <div class="store-pricing-row ideal-price-row">
                         <span class="store-pricing-label">Preço Ideal Sugerido:</span>
                         <span class="store-pricing-value" id="preco-ideal-${idLoja}">R$ 0,00</span>
@@ -1282,21 +1322,21 @@ function abrirModalPrecificacao(produtoId) {
                     </div>
                     <div class="store-pricing-row final-result-row">
                         <span class="store-pricing-label">↳ Lucro Real (Margem):</span>
-                        
                         <span class="store-pricing-value">
                             <span id="lucro-real-${idLoja}">R$ 0,00</span> (<span id="margem-real-${idLoja}">0,0%</span>)
                         </span>
-                        </div>
+                    </div>
                 </div>
             </div>`;
     });
 
     modalHTML += `
             </div>
-            <div class="modal-precificacao-footer">
-                <button type="button" class="modal-close-button" onclick="fecharModalPrecificacao()">Fechar</button>
+            <div class="modal-precificacao-footer" style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+                <button type="button" class="modal-close-button" onclick="fecharModalPrecificacao()">Cancelar</button>
+                <button type="button" class="modal-close-button" onclick="salvarPrecificacaoModal(${idBase}, ${isKit})" style="background-color: var(--modal-accent); border-color: var(--modal-accent);" onmouseover="this.style.backgroundColor='#6B46C1'" onmouseout="this.style.backgroundColor='var(--modal-accent)'">💾 Salvar e Fechar</button>
             </div>
-        </div>
+            </div>
     `;
 
     overlay.innerHTML = modalHTML;
@@ -1323,9 +1363,60 @@ function fecharModalPrecificacao() {
     }
 }
 
-// ===== INÍCIO DA CORREÇÃO 2 =====
-// A função inteira abaixo foi substituída pela versão simplificada
-// que calcula tudo a partir do "Lucro Desejado".
+// ===== INÍCIO DA CORREÇÃO 2.5 (Salvar Precificação) =====
+// Nova função para salvar os dados do modal
+function salvarPrecificacaoModal(itemId, isKit) {
+    const item = isKit ? kits.find(k => k.id === itemId) : produtos.find(p => p.id === itemId);
+    if (!item) {
+        mostrarNotificacao('Erro: Item não encontrado para salvar.', 'error');
+        return;
+    }
+
+    if (isKit) {
+        // Salvamento de precificação de kit não é suportado ainda
+        mostrarNotificacao('Salvamento de precificação de kit ainda não implementado.', 'info');
+        fecharModalPrecificacao();
+        return;
+    }
+
+    if (!item.pricingConfig) {
+        item.pricingConfig = {}; // Inicializa o objeto se não existir
+    }
+
+    let alteracoesFeitas = false;
+
+    Object.keys(lojasConfig).forEach(key => {
+        const idLoja = `${key}-${itemId}`;
+        const lucroDesejadoInput = document.getElementById(`lucro-desejado-${idLoja}`);
+        
+        if (lucroDesejadoInput) {
+            const lucroDesejado = parseFloat(lucroDesejadoInput.value);
+            if (!isNaN(lucroDesejado)) {
+                item.pricingConfig[key] = lucroDesejado;
+                alteracoesFeitas = true;
+            }
+        }
+    });
+
+    if (alteracoesFeitas) {
+        // Encontra o índice do produto para salvar a array inteira
+        const produtoIndex = produtos.findIndex(p => p.id === itemId);
+        if (produtoIndex !== -1) {
+            produtos[produtoIndex] = item; // Atualiza o item no array
+            salvarDados('produtos', produtos); // Salva a array 'produtos' inteira
+            mostrarNotificacao('Configurações de precificação salvas!', 'success');
+        } else {
+            mostrarNotificacao('Erro ao encontrar produto para salvar.', 'error');
+        }
+    } else {
+        // Nenhuma notificação se nada mudou
+    }
+
+    fecharModalPrecificacao(); // Fecha o modal após salvar
+}
+// ===== FIM DA CORREÇÃO 2.5 =====
+
+
 function calcularPrecoLojaModal(lojaKey, itemId, trigger, isKit) {
     // O cálculo agora sempre flui do "Lucro Desejado"
     
@@ -1379,20 +1470,18 @@ function calcularPrecoLojaModal(lojaKey, itemId, trigger, isKit) {
     const lucroRealFormatado = formatarMoeda(lucroReal);
     const margemRealFormatada = `${margemReal.toFixed(1).replace('.', ',')}%`;
 
-    // ===== INÍCIO DA CORREÇÃO 2 (JS) =====
     lucroRealSpan.textContent = lucroRealFormatado;
     margemRealSpan.textContent = margemRealFormatada;
-    // ===== FIM DA CORREÇÃO 2 (JS) =====
 
     // 8. Aplicar classes de cor
-    lucroRealSpan.parentElement.classList.remove('profit-positive', 'profit-negative'); // Aplica no PAI
+    const parentSpan = lucroRealSpan.parentElement; // Pega o <span> pai
+    parentSpan.classList.remove('profit-positive', 'profit-negative');
     if (lucroReal > 0) {
-        lucroRealSpan.parentElement.classList.add('profit-positive');
+        parentSpan.classList.add('profit-positive');
     } else if (lucroReal < 0) {
-        lucroRealSpan.parentElement.classList.add('profit-negative');
+        parentSpan.classList.add('profit-negative');
     }
 }
-// ===== FIM DA CORREÇÃO 2 =====
 
 
 // --- Sistema de Notificações ---
