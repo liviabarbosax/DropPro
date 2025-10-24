@@ -1271,7 +1271,7 @@ function abrirModalPrecificacao(produtoId) {
                     </div>
                     <div class="store-pricing-row final-result-row">
                         <span class="store-pricing-label">↳ Lucro Real (Margem):</span>
-                        {/* Combina lucro e margem */}
+                        {/* Combina lucro e margem */
                         <span class="store-pricing-value" id="lucro-real-${idLoja}">R$ 0,00 (<span id="margem-real-${idLoja}">0,0%</span>)</span>
                     </div>
                 </div>
