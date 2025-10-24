@@ -1275,6 +1275,7 @@ function abrirModalPrecificacao(produtoId) {
                         <span class="store-pricing-label">↳ Taxa Fixa:</span>
                         <span class="store-pricing-value store-pricing-detail" id="taxa-fixa-valor-${idLoja}">R$ 0,00</span>
                     </div>
+                    
                     <div class="store-pricing-row final-price-row">
                          <label for="preco-final-${idLoja}" class="store-pricing-label">Preço Final (R$):</label>
                         <input type="number" step="0.01" value="0.00" id="preco-final-${idLoja}" class="store-input bg-gray-600" readonly>
@@ -1319,7 +1320,9 @@ function fecharModalPrecificacao() {
     }
 }
 
-/// [FUNÇÃO CORRIGIDA E SIMPLIFICADA]
+// ===== INÍCIO DA CORREÇÃO 2 =====
+// A função inteira abaixo foi substituída pela versão simplificada
+// que calcula tudo a partir do "Lucro Desejado".
 function calcularPrecoLojaModal(lojaKey, itemId, trigger, isKit) {
     // O cálculo agora sempre flui do "Lucro Desejado"
     
@@ -1384,6 +1387,7 @@ function calcularPrecoLojaModal(lojaKey, itemId, trigger, isKit) {
         lucroRealSpan.classList.add('profit-negative');
     }
 }
+// ===== FIM DA CORREÇÃO 2 =====
 
 
 // --- Sistema de Notificações ---
